@@ -1,5 +1,10 @@
 var ListModule = (function () {
 
+    /********************
+    * Lists
+    *
+    ********************/
+
     function List(arr) {
         var populateList = function (element) {
             this.append(element);
@@ -116,6 +121,11 @@ var ListModule = (function () {
         }
     };
 
+    /********************
+    * Stacks
+    *
+    ********************/
+
     function Stack(arr) {
         var populateStack = function (element) {
             this.push(element);
@@ -153,6 +163,11 @@ var ListModule = (function () {
             this.top = 0;
         }
     };
+
+    /********************
+    * Queues
+    *
+    ********************/
 
     function Queue(arr) {
         var populateQueue = function (element) {
@@ -204,14 +219,19 @@ var ListModule = (function () {
         }
     };
 
-    function Node(element) {
+    /********************
+    * Linked Lists
+    *
+    ********************/
+
+    function LinkedList() {
+        this.head = new LLNode("head");
+    }
+
+    function LLNode(element) {
         this.element = element;
         this.next = null;
         this.previous = null; // for doubly linked list
-    }
-
-    function LinkedList() {
-        this.head = new Node("head");
     }
 
     LinkedList.prototype = {
@@ -226,7 +246,7 @@ var ListModule = (function () {
         },
 
         insert: function (newElement, item) {
-            var newNode = new Node(newElement),
+            var newNode = new LLNode(newElement),
                 current = this.find(item);
             newNode.next = current.next;
             current.next = newNode;
@@ -274,7 +294,7 @@ var ListModule = (function () {
     DoubleLinkedList.prototype = Object.create(LinkedList.prototype);
     DoubleLinkedList.prototype.constructor = DoubleLinkedList;
     DoubleLinkedList.prototype.insert = function (newElement, item) {
-        var newNode = new Node(newElement),
+        var newNode = new LLNode(newElement),
             current = this.find(item);
             newNode.next = current.next;
             newNode.previous = current;
@@ -304,6 +324,12 @@ var ListModule = (function () {
             currentNode = currentNode.previous;
         }
     };
+
+    /********************
+    * Dictionaries --
+    *   "A dictionary is a data structure that stores data as key-value pairs...."
+    *    Data Structures & Algorithms with JavaScript (Kindle Locations 6504-6505). Kindle Edition.
+    ********************/
 
     function Dictionary() {
         this.dataStore = [];
@@ -341,25 +367,158 @@ var ListModule = (function () {
         }, this);
     };
 
+    /********************
+    * Hash Tables
+    *
+    ********************/
+
     function HashTable() {
         this.table = [];
         this.table.length = 137;
     }
 
-    HashTable.prototype.simpleHash = function () {
+    HashTable.prototype.simpleHash = function (data) {
+        var i = 0,
+            ttl = 0;
+        for (; i < data.length; i++) {
+            ttl += data.charCodeAt(i);
+        }
+        return ttl % this.table.length;
+    };
 
+    HashTable.prototype.hornerHash = function (data) {
+        var HORNER_VAL = 41,
+            i = 0,
+            ttl = 0;
+        for (; i < data.length; i++) {
+            ttl += HORNER_VAL * ttl + data.charCodeAt(i);
+        }
+        ttl = ttl % this.table.length >=0 ? ttl % this.table.length : this.table.length - 1;
+        return parseInt(ttl, 10);
     };
 
     HashTable.prototype.showDistro = function () {
+        var i = 0,
+            n = 0;
+        for (; i < this.table.length; i++) {
+            if (this.table[i] !== undefined) {
+                console.log(i + ": " + this.table[i]);
+            }
+        }
+    };
+
+    HashTable.prototype.put = function (key, data) {
+        //var pos = this.simpleHash(data);
+        var pos = this.hornerHash(key);
+        this.table[pos] = data;
+    };
+
+    HashTable.prototype.get = function (key) {
+        return this.table[this.hornerHash(key)];
+    };
+
+    /********************
+    * Sets --
+    *   "A set is a collection of unique elements."
+    *   "The two most important properties of sets are that the members of a set are unordered and
+    *    that no member can occur in a set more than once."
+    *   "Sets can be useful when you want to create a data structure that consists only of unique
+    *    elements, such as a list of each unique word in a text.""
+    *
+    *   Data Structures & Algorithms with JavaScript (Kindle Locations 8202-8205). Kindle Edition.
+    *
+    ********************/
+
+    function Set () {
+        this.dataStore = [];
+    }
+
+    Set.prototype.add = function (value) {
+        // add only if value not in Set
+        if (this.dataStore.indexOf(value) < 0) {
+            this.dataStore.push(value);
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    Set.prototype.remove = function (value) {
+        var position = this.dataStore.indexOf(value);
+        if (position < 0) {
+            return false;
+        } else {
+            this.dataStore.splice(position, 1);
+            return true;
+        }
 
     };
 
-    HashTable.prototype.put = function () {
-
+    Set.prototype.show = function () {
+        console.log(this.dataStore.toString());
+        return this.dataStore;
     };
 
-    HashTable.prototype.get = function () {
+    Set.prototype.size = function () {
+        return this.dataStore.length;
+    };
 
+    Set.prototype.contains = function (value) {
+        if (this.dataStore.indexOf(value) < 0) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    // conbine this set with set provided, return new set of unique values
+    Set.prototype.union = function (set) {
+        var tempSet = new Set();
+        this.dataStore.forEach( function (value) {
+            tempSet.add(value);
+        }, this);
+        set.dataStore.forEach( function (value) {
+            if (!tempSet.contains(value)) {
+                tempSet.add(value);
+            }
+        });
+        return tempSet;
+    };
+
+    // finds members in both sets, return new set of members
+    Set.prototype.intersect = function (set) {
+        var tempSet = new Set();
+        this.dataStore.forEach( function (value) {
+            if (set.contains(value)) {
+                tempSet.add(value);
+            }
+        }, this);
+        return tempSet;
+    };
+
+    // true if all members of set 'this' are contained in set 'set'
+    Set.prototype.subset = function (set) {
+        var retVal = true;
+        if (this.size() > set.size()) {
+            return false;
+        } else {
+            this.dataStore.forEach( function (value) {
+                console.log(value, set.contains(value));
+                retVal = retVal && set.contains(value);
+            }, this);
+        }
+        return retVal;
+    };
+
+    // return new set of all members of set 'this' that are not in set 'set'
+    Set.prototype.difference = function (set) {
+        var tempSet = new Set();
+        this.dataStore.forEach( function (value) {
+            if (!set.contains(value)) {
+                tempSet.add(value);
+            }
+        }, this);
+        return tempSet;
     };
 
     return {
@@ -369,7 +528,8 @@ var ListModule = (function () {
         LinkedList: LinkedList,
         DoubleLinkedList: DoubleLinkedList,
         Dictionary: Dictionary,
-        HashTable: HashTable
+        HashTable: HashTable,
+        Set: Set
     };
 
 
@@ -377,7 +537,6 @@ var ListModule = (function () {
 
 var movies = ["Pulp Fiction", "12 Angry Men"];
 var myList = new ListModule.List(movies);
-
 var myStack = new ListModule.Stack();
 
 
@@ -425,3 +584,101 @@ pbook.allKeys();
 console.log(pbook.count());
 pbook.removeAll();
 console.log(pbook.count());
+
+
+var pnumbers = new ListModule.HashTable();
+var testObj = [{name: 'name 1', number: '123'},{name: 'name 2', number: '345'},{name: 'name 3', number: '678'}];
+for (var i = 0; i < testObj.length; i++) {
+    pnumbers.put(testObj[i].name, testObj[i].number);
+}
+console.log(pnumbers.get('name 3'));
+
+
+
+var names = new ListModule.Set();
+names.add("David");
+names.add("Jennifer");
+names.add("Cynthia");
+names.add("Mike");
+names.add("Raymond");
+if (names.add("Mike")) {
+       console.log("Mike added");
+} else {
+       console.log("Can't add Mike, must already be in set");
+}
+
+console.log(names.show());
+var removed = "Mike";
+if (names.remove(removed)) {
+    console.log(removed + " removed.");
+} else {
+    console.log(removed + " not removed.");
+}
+names.add("Clayton");
+console.log(names.show());
+removed = "Alisa";
+if (names.remove(removed)) {
+    console.log(removed + " removed.");
+} else {
+    console.log(removed + " not removed.");
+}
+
+
+var cis = new ListModule.Set();
+cis.add("Mike");
+cis.add("Clayton");
+cis.add("Jennifer");
+cis.add("Raymond");
+var dmp = new ListModule.Set();
+dmp.add("Raymond");
+dmp.add("Cynthia");
+dmp.add("Jonathan");
+//var it = new ListModule.Set();
+var it = cis.union(dmp);
+console.log(it.show());
+
+var cis = new ListModule.Set();
+cis.add("Mike");
+cis.add("Clayton");
+cis.add("Jennifer");
+cis.add("Raymond");
+var dmp = new ListModule.Set();
+dmp.add("Raymond");
+dmp.add("Cynthia");
+dmp.add("Bryan");
+var inter = cis.intersect(dmp);
+console.log(inter.show());
+
+var it = new ListModule.Set();
+it.add("Cynthia");
+it.add("Clayton");
+it.add("Jennifer");
+it.add("Danny");
+it.add("Jonathan");
+it.add("Terrill");
+it.add("Raymond");
+it.add("Mike");
+var dmp = new ListModule.Set();
+dmp.add("Cynthia");
+//dmp.add("Bob");
+dmp.add("Raymond");
+dmp.add("Jonathan");
+if (dmp.subset(it)) {
+    console.log("DMP is a subset of IT.");
+} else {
+    console.log("DMP is NOT a subset of IT.");
+}
+
+var cis = new ListModule.Set();
+var it = new ListModule.Set();
+cis.add("Clayton");
+cis.add("Jennifer");
+cis.add("Danny");
+it.add("Bryan");
+it.add("Clayton");
+it.add("Jennifer");
+//var diff = new ListModule.Set();
+diff =it.difference(cis);
+console.log("[" +it.show() + "] difference [" +cis.show()       + "] -> [" + diff.show() + "]");
+
+
