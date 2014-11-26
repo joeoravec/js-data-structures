@@ -521,6 +521,114 @@ var ListModule = (function () {
         return tempSet;
     };
 
+    /********************
+    * Trees --
+    *   "A binary search tree is a binary tree in which data with lesser values
+    *   are stored in left nodes and data with greater values are stored in right
+    *   nodes. This property provides for very efficient searches and holds for both
+    *   numeric data and non-numeric data, such as words and strings.""
+    *
+    *   Data Structures & Algorithms with JavaScript (Kindle Locations 8847-8849). Kindle Edition.
+    *
+    ********************/
+
+    function BTNode (data, left, right) {
+        this.data = data;
+        this.left = left;
+        this.right = right;
+    }
+
+    BTNode.prototype.show = function () {
+        return this.data;
+    };
+
+    function BinarySearchTree () {
+        this.rootNode = null;
+    }
+
+    BinarySearchTree.prototype.insert = function (data) {
+        var node = new BTNode(data, null, null),
+            current,
+            parent;
+
+        if (this.rootNode === null) { // No root node in BST? Then this node is the root node.
+            this.rootNode = node;
+        } else {
+            current = this.rootNode;
+            while (true) {
+                parent = current;
+                if (data < current.data) {
+                    current = current.left;
+                    if (current === null) {
+                        parent.left = node;
+                        break;
+                    }
+                } else {
+                    current = current.right;
+                    if (current === null) {
+                        parent.right = node;
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    BinarySearchTree.prototype.inOrder = function (node) { // visit all nodes in ascending order of key values
+        if (node !== null) {
+            this.inOrder(node.left);
+            console.log(node.show() + ",");
+            this.inOrder(node.right);
+        }
+    };
+
+    BinarySearchTree.prototype.preOrder = function (node) { // visit root node followed by nodes in subtrees under left child followed by nodes under right child
+        if (node !== null) {
+            console.log(node.show() + ",");
+            this.inOrder(node.left);
+            this.inOrder(node.right);
+        }
+    };
+
+    BinarySearchTree.prototype.postOrder = function (node) { // visit all child nodes of left subtree up to root followed by all child nodes of right subtree up to root
+        if (node !== null) {
+            this.inOrder(node.left);
+            this.inOrder(node.right);
+            console.log(node.show() + ",");
+        }
+    };
+
+    BinarySearchTree.prototype.getMin = function () {
+        var current = this.rootNode;
+        while (current.left !== null) {
+            current = current.left;
+        }
+        return current.data;
+    };
+
+    BinarySearchTree.prototype.getMax = function () {
+        var current = this.rootNode;
+        while (current.right !== null) {
+            current = current.right;
+        }
+        return current.data;
+    };
+
+    BinarySearchTree.prototype.find = function (value) {
+        var current = this.rootNode;
+        while (current.data !== value) {
+            if (value < current.data) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+            if (current === null) {
+                return 'not found';
+            }
+        }
+        return 'found';
+    };
+
     return {
         List: List,
         Stack: Stack,
@@ -529,7 +637,8 @@ var ListModule = (function () {
         DoubleLinkedList: DoubleLinkedList,
         Dictionary: Dictionary,
         HashTable: HashTable,
-        Set: Set
+        Set: Set,
+        BST: BinarySearchTree,
     };
 
 
@@ -681,4 +790,28 @@ it.add("Jennifer");
 diff =it.difference(cis);
 console.log("[" +it.show() + "] difference [" +cis.show()       + "] -> [" + diff.show() + "]");
 
+var nums = new ListModule.BST();
+nums.insert(23);
+nums.insert(45);
+nums.insert(16);
+nums.insert(37);
+nums.insert(3);
+nums.insert(99);
+nums.insert(22);
 
+console.log("inorder traversal: ");
+nums.inOrder(nums.rootNode);
+
+console.log("preorder traversal: ");
+nums.preOrder(nums.rootNode);
+
+console.log("postorder traversal: ");
+nums.postOrder(nums.rootNode);
+
+console.log('min value: ',  nums.getMin());
+
+console.log('max value: ',  nums.getMax());
+
+console.log('37',  nums.find(37), 'in bst');
+
+console.log('67',  nums.find(67), 'in bst');
